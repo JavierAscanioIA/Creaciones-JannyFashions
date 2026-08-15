@@ -962,22 +962,21 @@ database.ref('pedidos').on('value', (snapshot) => {
     });
   }
 
-  window.toggleOrderCard = function(id) {
+ window.toggleOrderCard = function(id) {
     let card = document.getElementById('order-card-' + id);
     if (card) card.classList.toggle('open');
-  };
+};
 
-  window.saveOrderDetail = function(id) {
-    let p = movs.find(m => m.id === id);
+window.saveOrderDetail = function(id) {
+    let p = movs.find(m => m.id == id);
     if (!p) return;
     let newDet = document.getElementById('order-det-' + id).value.trim();
     p.det = newDet;
-    p.lastUpdate = new Date().toLocaleDateString('es-VE',{day:'2-digit',month:'short',year:'numeric'}) + ' ' + new Date().toLocaleTimeString('es-VE',{hour:'2-digit',minute:'2-digit'});
+    p.lastUpdate = new Date().toLocaleDateString('es-VE', {day:'2-digit', month:'short', year:'numeric'}) + ' ' + new Date().toLocaleTimeString('es-VE', {hour:'2-digit', minute:'2-digit'});
     saveAll();
     renderOrders();
     renderWaLists();
-    alert('Corrección guardada. Fecha y hora de actualización registradas.');
-  };
+};
 
   window.cambiarEstado = function(id, nuevoEst) {
     let p = movs.find(m => m.id === id);
