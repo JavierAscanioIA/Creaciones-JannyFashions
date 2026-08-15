@@ -894,12 +894,12 @@ database.ref('pedidos').on('value', (snapshot) => {
   }
 
   // ===================== PEDIDOS: tarjetas numeradas + detalle expandible =====================
-  function countOrdersForClient(nombre, exceptId) {
-    return movs.filter(m => m.nom.trim().toLowerCase() === nombre.trim().toLowerCase() && m.id !== exceptId).length;
-  }
-
-  function renderOrders() {
-    let wrap = document.getElementById("orders-list");
+ function countOrdersForClient(nombre, exceptoId) {
+    if (!nombre) return 0;
+    const nomBuscado = String(nombre).trim().toLowerCase();
+    const lista = (typeof movs !== 'undefined') ? movs : [];
+    return lista.filter(m => m.id !== exceptoId && m.nom && String(m.nom).trim().toLowerCase() === nomBuscado).length;
+}
     let q = (document.getElementById('orders-search')?.value || '').trim().toLowerCase();
     wrap.innerHTML = "";
     let filtered = movs.filter(m => {
