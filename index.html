@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Creaciones Janny Fashions — Sistema de Gestión & Pedidos</title>
+<style>
+  :root {
+    --fn: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --cbg: #ffffff; --cbg2: #f8fafc; --cbg3: #f1f5f9;
+    --cb1: #cbd5e1; --cb2: #e2e8f0; --cb3: #f1f5f9;
+    --ct1: #0f172a; --ct2: #64748b;
+    --navy: #1a365d; --navy2:#142a4a; --gold: #EF9F27;
+    --pink:#e879c8; --teal:#2dd4bf;
+    --strip-img: linear-gradient(135deg, #fbc5ec 0%, #d6b3fc 35%, #a4e3fc 70%, #87cdff 100%);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--fn); }
+  body { margin:0; padding:14px; background:#eef2f6; color: var(--ct1); font-size: 14px; }
+  
+  #jf .bgwrap {
+    position: relative; border-radius: 14px; overflow: hidden;
+    box-shadow: 0 10px 30px -8px rgba(0,0,0,0.25); min-height: 700px;
+    background-color: #ffffff;
+  }
+  
+  .app { position:relative; z-index:1; background: transparent; min-height: 700px; display: flex; flex-direction: column; }
+  .topbar { 
+    background-image: var(--strip-img); padding: 0.6rem 1.1rem; display: flex; 
+    justify-content: space-between; align-items: center; box-shadow: 0 2px 10px -4px rgba(0,0,0,.3); 
+  }
+  .brand { display: flex; align-items: center; gap: .6rem; }
+  .brand-logo { height: 38px; width: auto; border-radius: 6px; display:block; box-shadow: 0 1px 6px rgba(0,0,0,.25); }
+  .brand-t { font-size: .95rem; font-weight: 700; color: #000000; letter-spacing: .04em; text-transform: uppercase; line-height: 1.15; }
+  .brand-sub { font-size: .62rem; font-weight: 600; color: #1a1a1a; letter-spacing: .05em; }
+
+  .cnav { display: flex; gap: .5rem; background: rgba(248,250,252,0.92); backdrop-filter: blur(2px); border-bottom: 1px solid var(--cb2); padding: .6rem 1.1rem; flex-wrap: wrap; align-items: center; }
+  .nb { padding: .55rem 1.05rem; border: none; background: #fff; font-size: .86rem; font-weight: 600; color: var(--ct2); cursor: pointer; border-radius: 9px; display: flex; align-items: center; gap: .35rem; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,.08); transition: all .15s ease; }
+  .nb.active { background: var(--navy); color: #fff; box-shadow: 0 3px 10px -2px rgba(26,54,93,.55); }
+  .nb:hover:not(.active) { background: var(--cb3); color: var(--ct1); transform: translateY(-2px); }
+  
+  .body { padding: 1.1rem; flex: 1; }
+  .view { display: none; }
+  .view.active { display: block; }
+  
+  .panel { background: rgba(255,255,255,0.94); border: 1px solid var(--cb2); border-radius: 10px; padding: .9rem; margin-bottom: .9rem; box-shadow:0 2px 8px -4px rgba(0,0,0,.1); }
+  .ph { font-size: .9rem; font-weight: 700; margin-bottom: .65rem; display: flex; align-items: center; gap: .35rem; color: var(--navy); border-bottom: 1px solid var(--cb3); padding-bottom: .45rem; }
+  
+  .fg { margin-bottom: .8rem; }
+  .fg label { display: block; font-size: .77rem; font-weight: 500; color: var(--ct2); margin-bottom: .25rem; }
+  .fg input, .fg select, .fg textarea { width: 100%; padding: .45rem; border: 1px solid var(--cb1); border-radius: 6px; font-size: .82rem; background: var(--cbg); color: var(--ct1); }
+  .fgrow { display:grid; grid-template-columns: 1fr 1fr; gap:.7rem; }
+  @media (max-width: 560px){ .fgrow{ grid-template-columns: 1fr; } }
+  
+  .pgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: .9rem; margin-top: .65rem; }
+  .pcard { background: rgba(255,255,255,0.92); border: 1px solid var(--cb2); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow:0 2px 8px -4px rgba(0,0,0,.12); }
+  .pinfo { padding: .85rem; flex: 1; display: flex; flex-direction: column; gap: .35rem; }
+  .ptit { font-size: .85rem; font-weight: 600; color: var(--ct1); }
+  .pprice { font-size: 1rem; font-weight: 600; color: #854F0B; }
+  
+  .sbtn { background: var(--navy); color: #fff; border: none; padding: .55rem .9rem; border-radius: 8px; font-size: .85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: .4rem; }
+  .sbtn:hover{ background:var(--navy2); }
+  .sbtn.grn{ background:#1f7a3d; } .sbtn.grn:hover{ background:#175e2e; }
+  
+  table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+  th, td { padding: .45rem .55rem; border-bottom: 1px solid var(--cb3); text-align: left; }
+  th { background: var(--cbg2); color: var(--ct2); font-weight: 600; }
+  
+  .wabtn { background: #25D366; color: #fff; padding: .4rem .7rem; border-radius: 6px; font-size: .78rem; font-weight:600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: .3rem; border:none; }
+  .wabtn:hover { background: #128C7E; }
+</style>
+</head>
+<body>
+
+<div id="jf">
+<div class="bgwrap">
+<div class="app">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="brand">
+      <div>
+        <div class="brand-t">Creaciones Janny Fashions</div>
+        <div class="brand-sub">Sistema de Gestión, Inventario & Pedidos</div>
+      </div>
+    </div>
+    <div id="db-status" style="font-size:0.75rem; font-weight:bold; color:#1f7a3d; background:#EAF3DE; padding:4px 8px; border-radius:5px;">
+      Base de Datos: Conectada 🟢
+    </div>
+  </div>
+
+  <!-- NAVEGACIÓN POR PESTAÑAS -->
+  <div class="cnav">
+    <button class="nb active" onclick="switchTab('catalogo')">🛍️ Catálogo</button>
+    <button class="nb" onclick="switchTab('pedidos')">📦 Pedidos</button>
+    <button class="nb" onclick="switchTab('inventario')">📋 Inventario</button>
+    <button class="nb" onclick="switchTab('whatsapp')">💬 Enviar WhatsApp</button>
+  </div>
+
+  <!-- CUERPO DE LAS PESTAÑAS -->
+  <div class="body">
+    
+    <!-- PESTAÑA 1: CATÁLOGO -->
+    <div id="view-catalogo" class="view active">
+      <div class="panel">
+        <div class="ph">Registrar Nuevo Producto</div>
+        <form id="form-producto" onsubmit="guardarProducto(event)">
+          <div class="fgrow">
+            <div class="fg">
+              <label>Nombre del Producto/Prenda</label>
+              <input type="text" id="prod-nombre" required placeholder="Ej. Camisa Personalizada">
+            </div>
+            <div class="fg">
+              <label>Precio ($)</label>
+              <input type="number" step="0.01" id="prod-precio" required placeholder="0.00">
+            </div>
+          </div>
+          <button type="submit" class="sbtn grn">Guardar en Inventario</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <div class="ph">Catálogo de Productos</div>
+        <div id="grid-productos" class="pgrid">
+          <!-- Carga dinámica -->
+        </div>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 2: PEDIDOS -->
+    <div id="view-pedidos" class="view">
+      <div class="panel">
+        <div class="ph">Crear Nuevo Pedido</div>
+        <form id="form-pedido" onsubmit="guardarPedido(event)">
+          <div class="fgrow">
+            <div class="fg">
+              <label>Nombre del Cliente</label>
+              <input type="text" id="ped-cliente" required placeholder="Nombre completo">
+            </div>
+            <div class="fg">
+              <label>Teléfono (WhatsApp)</label>
+              <input type="text" id="ped-tel" required placeholder="Ej. 584120000000">
+            </div>
+          </div>
+          <div class="fg">
+            <label>Detalle del Pedido / Productos</label>
+            <textarea id="ped-detalle" rows="3" required placeholder="Ej. 1x Camisa Sublimada Talla M, 1x Taza Personalizada"></textarea>
+          </div>
+          <div class="fg">
+            <label>Total a Pagar ($)</label>
+            <input type="number" step="0.01" id="ped-total" required placeholder="0.00">
+          </div>
+          <button type="submit" class="sbtn grn">Registrar Pedido</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <div class="ph">Lista de Pedidos Registrados</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Teléfono</th>
+              <th>Detalle</th>
+              <th>Total</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-pedidos">
+            <!-- Carga dinámica -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 3: INVENTARIO -->
+    <div id="view-inventario" class="view">
+      <div class="panel">
+        <div class="ph">Control de Inventario</div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Producto</th>
+              <th>Precio</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-inventario">
+            <!-- Carga dinámica -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 4: WHATSAPP DIRECTO -->
+    <div id="view-whatsapp" class="view">
+      <div class="panel">
+        <div class="ph">Generador de Mensajes Directos por WhatsApp</div>
+        <div class="fg">
+          <label>Número de WhatsApp (con código de país, ej: 584121234567)</label>
+          <input type="text" id="wa-num" placeholder="584120000000">
+        </div>
+        <div class="fg">
+          <label>Mensaje Personalizado</label>
+          <textarea id="wa-msg" rows="4" placeholder="¡Hola! Muchas gracias por tu compra en Creaciones Janny Fashions..."></textarea>
+        </div>
+        <button class="wabtn" onclick="enviarWACombo()">📱 Abrir WhatsApp Directo</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+</div>
+
+<script>
+// ==========================================
+// CONTROL DE NAVEGACIÓN POR PESTAÑAS
+// ==========================================
+function switchTab(tabId) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b => b.classList.remove('active'));
+  
+  document.getElementById('view-' + tabId).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ==========================================
+// GESTIÓN DE BASE DE DATOS (IndexedDB + LocalStorage Fallback)
+// ==========================================
+const DB_NAME = 'JannyFashionsDB';
+const DB_VERSION = 1;
+let db;
+
+function initDB() {
+  const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+  request.onerror = (event) => {
+    console.error("Error al abrir IndexedDB:", event);
+    document.getElementById('db-status').innerText = "BD: Modo LocalStorage 🟠";
+    cargarTodo();
+  };
+
+  request.onsuccess = (event) => {
+    db = event.target.result;
+    document.getElementById('db-status').innerText = "Base de Datos: Conectada 🟢";
+    cargarTodo();
+  };
+
+  request.onupgradeneeded = (event) => {
+    db = event.target.result;
+    if (!db.objectStoreNames.contains('productos')) {
+      db.createObjectStore('productos', { keyPath: 'id', autoIncrement: true });
+    }
+    if (!db.objectStoreNames.contains('pedidos')) {
+      db.createObjectStore('pedidos', { keyPath: 'id', autoIncrement: true });
+    }
+  };
+}
+
+// ==========================================
+// FUNCIONES DE PRODUCTOS / CATÁLOGO
+// ==========================================
+function guardarProducto(e) {
+  e.preventDefault();
+  const nombre = document.getElementById('prod-nombre').value;
+  const precio = parseFloat(document.getElementById('prod-precio').value);
+
+  const producto = { nombre, precio };
+
+  if (db) {
+    const tx = db.transaction(['productos'], 'readwrite');
+    tx.objectStore('productos').add(producto);
+    tx.oncomplete = () => {
+      document.getElementById('form-producto').reset();
+      cargarTodo();
+    };
+  } else {
+    let prods = JSON.parse(localStorage.getItem('prods') || '[]');
+    producto.id = Date.now();
+    prods.push(producto);
+    localStorage.setItem('prods', JSON.stringify(prods));
+    document.getElementById('form-producto').reset();
+    cargarTodo();
+  }
+}
+
+function cargarProductos() {
+  const grid = document.getElementById('grid-productos');
+  const tabla = document.getElementById('tabla-inventario');
+  grid.innerHTML = '';
+  tabla.innerHTML = '';
+
+  if (db) {
+    const tx = db.transaction(['productos'], 'readonly');
+    const store = tx.objectStore('productos');
+    store.getAll().onsuccess = (e) => {
+      renderProductos(e.target.result);
+    };
+  } else {
+    let prods = JSON.parse(localStorage.getItem('prods') || '[]');
+    renderProductos(prods);
+  }
+}
+
+function renderProductos(lista) {
+  const grid = document.getElementById('grid-productos');
+  const tabla = document.getElementById('tabla-inventario');
+
+  if (lista.length === 0) {
+    grid.innerHTML = '<p style="font-size:0.8rem; color:var(--ct2);">No hay productos agregados aún.</p>';
+    tabla.innerHTML = '<tr><td colspan="4">Sin registros.</td></tr>';
+    return;
+  }
+
+  lista.forEach(p => {
+    // Renderear Catálogo
+    grid.innerHTML += `
+      <div class="pcard">
+        <div class="pinfo">
+          <div class="ptit">${p.nombre}</div>
+          <div class="pprice">$${p.precio.toFixed(2)}</div>
+        </div>
+      </div>
+    `;
+
+    // Renderear Inventario
+    tabla.innerHTML += `
+      <tr>
+        <td>${p.id}</td>
+        <td>${p.nombre}</td>
+        <td>$${p.precio.toFixed(2)}</td>
+        <td><button style="color:red; cursor:pointer;" onclick="eliminarProducto(${p.id})">Eliminar</button></td>
+      </tr>
+    `;
+  });
+}
+
+function eliminarProducto(id) {
+  if (db) {
+    const tx = db.transaction(['productos'], 'readwrite');
+    tx.objectStore('productos').delete(id);
+    tx.oncomplete = () => cargarTodo();
+  } else {
+    let prods = JSON.parse(localStorage.getItem('prods') || '[]');
+    prods = prods.filter(p => p.id !== id);
+    localStorage.setItem('prods', JSON.stringify(prods));
+    cargarTodo();
+  }
+}
+
+// ==========================================
+// FUNCIONES DE PEDIDOS Y WHATSAPP INTEGRADO
+// ==========================================
+function guardarPedido(e) {
+  e.preventDefault();
+  const cliente = document.getElementById('ped-cliente').value;
+  const tel = document.getElementById('ped-tel').value.replace(/[^0-9]/g, '');
+  const detalle = document.getElementById('ped-detalle').value;
+  const total = parseFloat(document.getElementById('ped-total').value);
+
+  const pedido = { cliente, tel, detalle, total };
+
+  if (db) {
+    const tx = db.transaction(['pedidos'], 'readwrite');
+    tx.objectStore('pedidos').add(pedido);
+    tx.oncomplete = () => {
+      document.getElementById('form-pedido').reset();
+      cargarTodo();
+    };
+  } else {
+    let peds = JSON.parse(localStorage.getItem('peds') || '[]');
+    pedido.id = Date.now();
+    peds.push(pedido);
+    localStorage.setItem('peds', JSON.stringify(peds));
+    document.getElementById('form-pedido').reset();
+    cargarTodo();
+  }
+}
+
+function cargarPedidos() {
+  if (db) {
+    const tx = db.transaction(['pedidos'], 'readonly');
+    tx.objectStore('pedidos').getAll().onsuccess = (e) => {
+      renderPedidos(e.target.result);
+    };
+  } else {
+    let peds = JSON.parse(localStorage.getItem('peds') || '[]');
+    renderPedidos(peds);
+  }
+}
+
+function renderPedidos(lista) {
+  const tabla = document.getElementById('tabla-pedidos');
+  tabla.innerHTML = '';
+
+  if (lista.length === 0) {
+    tabla.innerHTML = '<tr><td colspan="5">No hay pedidos registrados.</td></tr>';
+    return;
+  }
+
+  lista.forEach(p => {
+    // Generación dinámica del Link de WhatsApp
+    const mensaje = `¡Hola ${p.cliente}! Tu pedido en *Creaciones Janny Fashions* de: ${p.detalle}. Total a pagar: *$${p.total.toFixed(2)}*. ¡Gracias por preferirnos!`;
+    const waUrl = `https://api.whatsapp.com/send?phone=${p.tel}&text=${encodeURIComponent(mensaje)}`;
+
+    tabla.innerHTML += `
+      <tr>
+        <td><b>${p.cliente}</b></td>
+        <td>${p.tel}</td>
+        <td>${p.detalle}</td>
+        <td><b>$${p.total.toFixed(2)}</b></td>
+        <td>
+          <a class="wabtn" href="${waUrl}" target="_blank">💬 Enviar WhatsApp</a>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function enviarWACombo() {
+  const num = document.getElementById('wa-num').value.replace(/[^0-9]/g, '');
+  const msg = document.getElementById('wa-msg').value;
+
+  if (!num) {
+    alert("Por favor ingresa un número de teléfono válido.");
+    return;
+  }
+
+  const url = `https://api.whatsapp.com/send?phone=${num}&text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+}
+
+// Cargar estado inicial
+function cargarTodo() {
+  cargarProductos();
+  cargarPedidos();
+}
+
+// Inicializar la aplicación al cargar
+window.onload = () => {
+  initDB();
+};
+</script>
+
+</body>
+</html>
